@@ -13,47 +13,48 @@ import numpy as np
 
 
 # %%
-def one_SQA_run(J, trans_fld_sched, M, T, ansatz_state=None):
+def one_SQA_run(J, h, trans_fld_sched, M, T, init_state=None):
     """
     One simulated quantum annealing run over the full transverse field strength schedule.
     The goal is to find a state such that sum(J[i, i]*state[i]) + sum(J[i, j]*state[i]*state[j]) is minimized.
     
     Parameters:
-        J (2-D array of float): The matrix representing the local and coupling field of the problem.
-                                Local fields should be on the diagonal of the input matrix.
+        J (2-D array of float): The matrix representing the coupling field of the problem.
+        h (1-D array of float): The vector representing the local field of the problem.
         trans_fld_sched (list[float]): The transeverse field strength schedule for QA.
                                        The number of iterations is implicitly the length of trans_fld_schedule.
         M (int): Number of Trotter replicas. Larger M leads to higher probability of finding ground state.
         T (float): Temperature parameter. Smaller T leads to higher probability of finding ground state.
-        ansatz_state (1-D array of int, default=None): The boolean vector representing the initial state.
-                                                        If None, a random state is chosen.
+        init_state (1-D array of int, default=None): The boolean vector representing the initial state.
+                                                     If None, a random state is chosen.
     
     Return: final_state (1-D array of int)
     """
-    
+    if np.any(np.diag(J)):
+        raise ValueError("Diagonal elements of J should be 0.")
+
     # J: block sparse matrices with block size of (N, N)
     N = J.shape[0]
-    J = 0.5*(J + J.T) # making sure J is symmetric
-    J = np.kron(np.eye(M), J/M) # block diagonal of J, repeated M times and divided by M
+    j = 0.5*(J + J.T) # making sure J is symmetric
+    j = np.kron(np.eye(M), j/M) # block diagonal of J, repeated M times and divided by M
     
-    h = np.diag(J).copy() # separate local terms from couplings
-    np.fill_diagonal(J, 0)
-    
+    h_extended = np.repeat(h/M, M)
+
     Jp_terms = np.eye(N*M, k=N) + np.eye(N*M, k=N*(1-M))
     Jp_terms = 0.5*(Jp_terms + Jp_terms.T)
     
-    if ansatz_state is None:
+    if init_state is None:
         state = 2 * np.random.binomial(1, 0.5, N*M) - 1
     else:
-        state = np.tile(ansatz_state, M)
+        state = np.tile(init_state, M)
     
     
     for Gamma in trans_fld_sched:
         Jp_coef = -0.5 * T * np.log(np.tanh(Gamma / M / T))
         
         # First design (Tohoku)
-        for flip in range(N*M):
-            delta_E = -4 * (J - Jp_coef * Jp_terms)[flip].dot(state) * state[flip] - 2 * h[flip] * state[flip]
+        for flip in range(N*M): # can be parallelized
+            delta_E = -4 * (j - Jp_coef * Jp_terms)[flip].dot(state) * state[flip] - 2 * h_extended[flip] * state[flip]
             if np.random.binomial(1, np.minimum(np.exp(-delta_E/T), 1.)):
                 state[flip] *= -1
 
