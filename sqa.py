@@ -31,7 +31,7 @@ def one_SQA_run(J, h, trans_fld_sched, M, T, init_state=None):
     Return: final_state (1-D array of int)
     """
     if np.any(np.diag(J)):
-        raise ValueError("Diagonal elements of J should be 0.")
+        raise ValueError("Diagonal elements of J should be 0")
 
     # J: block sparse matrices with block size of (N, N)
     N = J.shape[0]
