@@ -13,7 +13,7 @@ import numpy as np
 
 
 # %%
-def one_SQA_run(J, h, trans_fld_sched, M, T, init_state=None, sd=None):
+def one_SQA_run(J, h, trans_fld_sched, M, T, sd=None, init_state=None):
     """
     One simulated quantum annealing run over the full transverse field strength schedule.
     The goal is to find a state such that sum(J[i, i]*state[i]) + sum(J[i, j]*state[i]*state[j]) is minimized.
@@ -25,9 +25,9 @@ def one_SQA_run(J, h, trans_fld_sched, M, T, init_state=None, sd=None):
                                        The number of iterations is implicitly the length of trans_fld_schedule.
         M (int): Number of Trotter replicas. Larger M leads to higher probability of finding ground state.
         T (float): Temperature parameter. Smaller T leads to higher probability of finding ground state.
+        sd (default=None): Seed for numpy.random.
         init_state (1-D array of int, default=None): The boolean vector representing the initial state.
                                                      If None, a random state is chosen.
-        sd (default=None): Seed for numpy.random.
     
     Return: final_state (1-D array of int)
     """
