@@ -13,7 +13,7 @@ import numpy as np
 
 
 # %%
-def one_SQA_run(J, h, trans_fld_sched, M, T, init_state=None):
+def one_SQA_run(J, h, trans_fld_sched, M, T, init_state=None, sd=None):
     """
     One simulated quantum annealing run over the full transverse field strength schedule.
     The goal is to find a state such that sum(J[i, i]*state[i]) + sum(J[i, j]*state[i]*state[j]) is minimized.
@@ -27,9 +27,12 @@ def one_SQA_run(J, h, trans_fld_sched, M, T, init_state=None):
         T (float): Temperature parameter. Smaller T leads to higher probability of finding ground state.
         init_state (1-D array of int, default=None): The boolean vector representing the initial state.
                                                      If None, a random state is chosen.
+        sd (default=None): Seed for numpy.random.
     
     Return: final_state (1-D array of int)
     """
+    np.random.seed(sd)
+
     if np.any(np.diag(J)):
         raise ValueError("Diagonal elements of J should be 0")
 
