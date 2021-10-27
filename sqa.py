@@ -23,7 +23,7 @@ def one_SQA_run(J, h, trans_fld_sched, M, T, sd=None, init_state=None):
         h (1-D array of float): The vector representing the local field of the problem.
         trans_fld_sched (list[float]): The transeverse field strength schedule for QA.
                                        The number of iterations is implicitly the length of trans_fld_schedule.
-        M (int): Number of Trotter replicas. Larger M leads to higher probability of finding ground state.
+        M (int): Number of Trotter replicas. To simulate QA precisely, M should be chosen such that T M / Gamma >> 1.
         T (float): Temperature parameter. Smaller T leads to higher probability of finding ground state.
         sd (default=None): Seed for numpy.random.
         init_state (1-D array of int, default=None): The boolean vector representing the initial state.
