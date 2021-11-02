@@ -81,12 +81,16 @@ def one_SQA_run(J, h, trans_fld_sched, M, T, sd=None, init_state=None):
 
 # %%
 def main():
+    """
+    A simple showcase
+    """
     import time
     import matplotlib.pyplot as plt
 
 
-    J = np.array([[-1., 0., 0., 0.], [0., 1., 0., 0.], [0., 0., 1., 0.], [0., 0., 0., 1.]])
-    N = J.shape[0]
+    N = 4
+    J = np.zeros((N, N))
+    h = np.array([-1, 1, 1, 1])
     ansatz = np.zeros(J.shape[0], dtype=np.bool_)
 
     M = 40
@@ -102,7 +106,7 @@ def main():
 
     np.random.seed(0)
     start_time = time.time()
-    ans = one_SQA_run(J, schedule, M, T)
+    ans = one_SQA_run(J, h, schedule, M, T)
     total_time = time.time() - start_time
     print(f"ground state: {np.sign(np.sum(np.reshape(ans, (M, N)), axis=0))}")
     print(f'time: {total_time} s')
